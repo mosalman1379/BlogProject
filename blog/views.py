@@ -5,6 +5,7 @@ from django.views.generic import ListView
 from taggit.models import Tag
 from blog.forms import EmailPostForm, CommentForm
 from blog.models import Post
+from django.db.models.aggregates import Count
 
 
 # This function is another view of PostList class based view
@@ -30,7 +31,7 @@ def post_list(request, tag_slug=None):
     except EmptyPage:
         # if page is out of range deliver last page of results
         posts = paginator.page(paginator.num_pages)
-    return render(request, 'blog/list.html', {'posts': posts, 'page': page,'tag':tag})
+    return render(request, 'blog/list.html', {'posts': posts, 'page': page, 'tag': tag})
 
 
 class PostList(ListView):
@@ -66,8 +67,12 @@ def post_detail(request, year, month, day, post):
             new_comment.save()
     else:
         comment_form = CommentForm()
+    posts_tags_ids = post.tags. \
+        values_list('id', flat=True)  # getting tags that exist in my post by id of all tags in list object
+    similar_posts = Post.published.filter(tags__in=posts_tags_ids).exclude(pk=post.pk)  # filtering posts
+    similar_posts = similar_posts.annotate(same_tags=Count('tags')).order_by('-same_tags', '-publish')[:4]
     return render(request, 'blog/detail.html', {'post': post, 'comments': comments, 'new_comment': new_comment,
-                                                'comment_form': comment_form})
+                                                'comment_form': comment_form, 'similar_posts': similar_posts})
 
 
 def post_share(request, post_id):
