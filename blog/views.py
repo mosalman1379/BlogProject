@@ -1,21 +1,25 @@
-from django.conf import settings
 from django.core.mail import send_mail
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
-
+from taggit.models import Tag
 from blog.forms import EmailPostForm, CommentForm
 from blog.models import Post
 
 
 # This function is another view of PostList class based view
-def post_list(request):
+def post_list(request, tag_slug=None):
     """
     this view functions show all post objects
+    :param tag_slug: add tag element for filtering all posts
     :param request:
     :return: all post objects
     """
+    tag = None
     posts = Post.published.all()
+    if tag_slug:
+        tag = get_object_or_404(klass=Tag, slug=tag_slug)
+        posts = posts.filter(tags__in=[tag])
     paginator = Paginator(posts, 3)  # 3 post in each page
     page = request.GET.get('page')
     try:
@@ -26,7 +30,7 @@ def post_list(request):
     except EmptyPage:
         # if page is out of range deliver last page of results
         posts = paginator.page(paginator.num_pages)
-    return render(request, 'blog/list.html', {'posts': posts, 'page': page})
+    return render(request, 'blog/list.html', {'posts': posts, 'page': page,'tag':tag})
 
 
 class PostList(ListView):
