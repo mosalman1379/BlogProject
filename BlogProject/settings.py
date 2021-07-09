@@ -66,6 +66,18 @@ TEMPLATES = [
     },
 ]
 
+EMAIL_HOST = 'smtp.gmail.com'
+
+EMAIL_HOST_USER = 'MOSALMAN1379@GMAIL.COM'.lower()
+
+EMAIL_HOST_PASSWORD = '13790723mohammad'
+
+EMAIL_PORT = 587
+
+EMAIL_USE_TLS = True
+
+EMAIL_USE_SSL = True
+
 WSGI_APPLICATION = 'BlogProject.wsgi.application'
 
 # Database
@@ -108,7 +120,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
