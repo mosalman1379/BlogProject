@@ -4,7 +4,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
 
-from blog.forms import EmailPostForm
+from blog.forms import EmailPostForm, CommentForm
 from blog.models import Post
 
 
@@ -51,7 +51,19 @@ def post_detail(request, year, month, day, post):
                              publish__year=year,
                              publish__month=month,
                              publish__day=day)
-    return render(request, 'blog/detail.html', {'post': post})
+
+    comments = post.comments.filter(active=True)
+    new_comment = None
+    if request.method == 'POST':
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            new_comment = comment_form.save(commit=False)
+            new_comment.post = post
+            new_comment.save()
+    else:
+        comment_form = CommentForm()
+    return render(request, 'blog/detail.html', {'post': post, 'comments': comments, 'new_comment': new_comment,
+                                                'comment_form': comment_form})
 
 
 def post_share(request, post_id):
@@ -63,7 +75,7 @@ def post_share(request, post_id):
             cd = form.cleaned_data
             post_url = request.build_absolute_uri(post.get_absolute_url())
             subject = f'{cd["name"]} recommends you read {post.title}'
-            message = f'Read {post.title} as {post_url}\n\n{cd["name"]}\'s comments: {cd["comments"]}'
+            message = f'Read {post.title} as {post_url}\n\n{cd["name"]}\'s comments: {cd["comment"]}'
             send_mail(subject, message, 'mosalman1379@gmail.com', [cd['to']])
             sent = True
     else:
