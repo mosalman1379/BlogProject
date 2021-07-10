@@ -2,10 +2,13 @@ from django.core.mail import send_mail
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
+from rest_framework.generics import ListAPIView
+from rest_framework.viewsets import ModelViewSet
 from taggit.models import Tag
 from blog.forms import EmailPostForm, CommentForm
-from blog.models import Post
+from blog.models import Post, Comment
 from django.db.models.aggregates import Count
+from blog.serializer import PostSerializer, CommentSerializer
 
 
 # This function is another view of PostList class based view
@@ -90,3 +93,19 @@ def post_share(request, post_id):
     else:
         form = EmailPostForm()
     return render(request, 'blog/share.html', context={'post': post, 'form': form, 'sent': sent})
+
+
+class ListPosts(ListAPIView):
+    """
+    REST list View for posts
+    """
+    queryset = Post.published.all()
+    serializer_class = PostSerializer
+
+
+class CommentViewSet(ModelViewSet):
+    """
+    View Set for comment model
+    """
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
