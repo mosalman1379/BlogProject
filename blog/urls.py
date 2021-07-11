@@ -1,6 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
+from blog.feeds import LatestPostsFeed
 from blog.views import post_detail, post_share, post_list, ListPosts, CommentViewSet
 
 app_name = 'blog'
@@ -15,5 +16,6 @@ urlpatterns = [
     path('<int:post_id>/', post_share, name='post_share'),
     path('tag/<slug:tag_slug>/', post_list, name='post_list_by_tag'),
     path('api/v1/', ListPosts.as_view(), name='show-post-api'),
-    path('api/v2/', include(router.urls), name='view-set-comment')
+    path('api/v2/', include(router.urls), name='view-set-comment'),
+    path('feed/', LatestPostsFeed(), name='post_feed')
 ]
