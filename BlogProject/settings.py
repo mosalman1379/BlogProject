@@ -26,9 +26,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+SITE_ID = 1
+
 # Application definition
 
 INSTALLED_APPS = [
+    'django.contrib.sites',
+    'django.contrib.sitemaps',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -37,10 +41,16 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'rest_framework',
     'blog.apps.BlogConfig',
-    'taggit'
+    'taggit',
+    'debug_toolbar'
+]
+
+INTERNAL_IPS = [
+    '127.0.0.1'
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
